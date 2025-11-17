@@ -1,0 +1,355 @@
+<!DOCTYPE html> 
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Status Perkara Kejaksaan Negeri Kotamobagu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Times New Roman', Times, serif;
+      background: url("WhatsApp Image 2025-10-22 at 12.50.31_fc72869a.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+
+    /* LOGIN */
+    #loginPage {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; background: rgba(0,0,0,0.6);
+    }
+    #loginBox { background: rgba(0,0,0,0.75); padding: 30px; border-radius: 10px; text-align: center; }
+    #loginBox h2 { color: #ff4444; margin-bottom: 20px; }
+    input, select, textarea {
+      width: 250px; padding: 10px; margin: 5px; border: none; border-radius: 5px;
+      font-family: 'Times New Roman';
+    }
+    button {
+      padding: 10px 20px; margin: 10px; border: none; border-radius: 5px;
+      background: #007bff; color: white; cursor: pointer;
+      font-family: 'Times New Roman';
+    }
+
+    /* HALAMAN UTAMA */
+    #mainPage { display: none; min-height: 100vh; background: rgba(0,0,0,0.6); }
+    header {
+      padding: 15px; border-bottom: 2px solid #ff4444; text-align: center; position: relative;
+    }
+    header h1 { color: #ff4444; margin: 0; }
+    header button { position: absolute; top: 15px; right: 15px; background: #ff4444; }
+
+    main { padding: 20px; max-width: 900px; margin: auto; text-align: center; }
+
+    /* TABEL PUTIH */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      margin-top: 15px;
+      font-family: 'Times New Roman';
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 10px;
+      text-align: left;
+      color: black;
+    }
+    th {
+      background-color: #ffdddd;
+      color: #ff4444;
+    }
+
+    footer {
+      margin-top: 20px; background: rgba(0,0,0,0.6); padding: 10px; color: #ccc; text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div id="loginBox">
+    <h2>🔒 Login Ke Sistem Status Perkara</h2>
+    <input id="username" type="text" placeholder="Username"><br>
+    <input id="password" type="password" placeholder="Password"><br>
+    <button onclick="login()">Masuk</button>
+    <p id="loginError" style="color: #ff8080;"></p>
+  </div>
+</div>
+
+<!-- MAIN PAGE -->
+<div id="mainPage">
+  <header>
+    <h1>KEJAKSAAN NEGERI KOTAMOBAGU</h1>
+    <h3>Informasi Status Perkara</h3>
+    <button onclick="logout()">Logout</button>
+  </header>
+
+  <main>
+
+    <!-- PENCARIAN -->
+    <div>
+      <input id="keyword" type="text" placeholder="Cari nama jaksa / nomor berkas / status">
+      <button onclick="cari()">Cari</button>
+      <button id="btnTambah" style="display:none;" onclick="toggleForm()">➕ Tambah Data</button>
+    </div>
+
+    <!-- HASIL -->
+    <div id="hasil"></div>
+
+    <!-- FORM TAMBAH -->
+    <div id="formTambah" style="display:none;">
+      <h3 style="color:#ff4444;">📝 Tambah Data Perkara</h3>
+      <input id="tNama" type="text" placeholder="Nama Tersangka"><br>
+      <input id="tNomor" type="text" placeholder="Nomor Berkas Perkara"><br>
+      <input id="tJaksa" type="text" placeholder="Nama Jaksa"><br>
+      <label>Tanggal Berkas Perkara:</label><br>
+      <input id="tTanggal" type="date"><br>
+
+      <select id="tStatus">
+        <option value="P-18">P-18</option>
+        <option value="P-19">P-19</option>
+        <option value="P-19 PERLU P-20">P-19 PERLU P-20</option>
+        <option value="PENUNTUTAN">PENUNTUTAN</option>
+        <option value="SOP FORM-3">SOP FORM-3</option>
+        <option value="P-20 PERLU SOP FORM-3">P-20 PERLU SOP FORM-3</option>
+        <option value="P-21 PERLU P-21A">P-21 PERLU P-21A</option>
+        <option value="BERKAS TAHAP 1">BERKAS TAHAP 1</option>
+      </select><br>
+
+      <button onclick="tambahData()">💾 Simpan</button>
+    </div>
+
+    <!-- FORM EDIT -->
+    <div id="formEdit" style="display:none;">
+      <h3 style="color:#ff4444;">✏️ Edit Data Perkara</h3>
+      <input id="eNama" type="text"><br>
+      <input id="eNomor" type="text" disabled><br>
+      <input id="eJaksa" type="text"><br>
+      <input id="eTanggal" type="date"><br>
+
+      <select id="eStatus">
+        <option value="P-18">P-18</option>
+        <option value="P-19">P-19</option>
+        <option value="P-19 PERLU P-20">P-19 PERLU P-20</option>
+        <option value="PENUNTUTAN">PENUNTUTAN</option>
+        <option value="SOP FORM-3">SOP FORM-3</option>
+        <option value="P-20 PERLU SOP FORM-3">P-20 PERLU SOP FORM-3</option>
+        <option value="P-21 PERLU P-21A">P-21 PERLU P-21A</option>
+        <option value="BERKAS TAHAP 1">BERKAS TAHAP 1</option>
+      </select><br>
+
+      <button onclick="simpanEdit()">💾 Simpan Perubahan</button>
+      <button onclick="batalEdit()">❌ Batal</button>
+    </div>
+
+    <!-- TABEL ADMIN -->
+    <div id="tabelContainer"></div>
+
+  </main>
+
+  <footer>
+    © 2025 Kejaksaan Negeri Kotamobagu | Informasi Publik Status Perkara
+  </footer>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+<script>
+// CONFIG FIREBASE MILIK ANDA
+const firebaseConfig = {
+  apiKey: "AIzaSyAQ3GwaExZXpEaNNFMo5bbfiSDAG3MvH2g",
+  authDomain: "status-perkara.firebaseapp.com",
+  projectId: "status-perkara",
+  storageBucket: "status-perkara.firebasestorage.app",
+  messagingSenderId: "340708770522",
+  appId: "1:340708770522:web:5a39447093fe1e525f9be3",
+  measurementId: "G-5TESFW121F"
+};
+
+// INISIALISASI FIREBASE
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let role = null;
+
+// LOGIN
+function login() {
+  const user = username.value.trim();
+  const pass = password.value.trim();
+
+  if (user === "ADMINPIDUM" && pass === "PIDUM123") { role = "admin"; }
+  else if (user === "PENGUNJUNG" && pass === "TAMPIL123") { role = "user"; }
+  else { loginError.textContent = "❌ Username atau Password salah!"; return; }
+
+  sessionStorage.setItem("loggedIn", "true");
+  sessionStorage.setItem("role", role);
+  tampilHalamanUtama();
+}
+
+function tampilHalamanUtama() {
+  loginPage.style.display = "none";
+  mainPage.style.display = "block";
+
+  if (role === "admin") {
+    btnTambah.style.display = "inline-block";
+    tampilkanSemua();
+  }
+}
+
+function logout() {
+  sessionStorage.clear();
+  location.reload();
+}
+
+// CARI DATA (READ)
+function cari() {
+  const key = keyword.value.trim().toUpperCase();
+  hasil.innerHTML = "";
+
+  db.collection("perkara").get().then((snap) => {
+    const ditemukan = snap.docs
+      .map(d => d.data())
+      .filter(p =>
+        p.nama.toUpperCase().includes(key) ||
+        p.nomor.toUpperCase().includes(key) ||
+        p.jaksa.toUpperCase().includes(key) ||
+        p.status.toUpperCase().includes(key)
+      );
+
+    if (ditemukan.length === 0) {
+      hasil.innerHTML = `<p style="color:#ff4444;">⚠ Tidak ada data.</p>`;
+      return;
+    }
+
+    hasil.innerHTML =
+      `<h3 style='color:#ff4444;'>🔍 Hasil Pencarian</h3>` +
+      ditemukan.map(p => `
+        <p><b>Nama Tersangka:</b> ${p.nama}</p>
+        <p><b>Nomor Berkas:</b> ${p.nomor}</p>
+        <p><b>Nama Jaksa:</b> ${p.jaksa}</p>
+        <p><b>Tanggal Berkas:</b> ${p.tanggal}</p>
+        <p><b>Status:</b> ${p.status}</p>
+        <hr>
+      `).join("");
+  });
+}
+
+// TAMPILKAN TABEL ADMIN (READ)
+function tampilkanSemua() {
+  db.collection("perkara").get().then((snap) => {
+    const data = snap.docs.map(d => d.data());
+
+    tabelContainer.innerHTML = `
+      <h3 style="color:#ff4444;">📋 Semua Data Perkara</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Nama Tersangka</th>
+            <th>Nomor Berkas</th>
+            <th>Nama Jaksa</th>
+            <th>Tanggal Berkas</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(p => `
+            <tr>
+              <td>${p.nama}</td>
+              <td>${p.nomor}</td>
+              <td>${p.jaksa}</td>
+              <td>${p.tanggal}</td>
+              <td>${p.status}</td>
+              <td>
+                <button onclick="editData('${p.nomor}')">✏ Edit</button>
+                <button onclick="hapusData('${p.nomor}')">🗑 Hapus</button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+  });
+}
+
+// TAMBAH DATA (CREATE)
+function tambahData() {
+  const p = {
+    nama: tNama.value.trim(),
+    nomor: tNomor.value.trim(),
+    jaksa: tJaksa.value.trim(),
+    tanggal: tTanggal.value,
+    status: tStatus.value
+  };
+
+  if (!p.nama || !p.nomor || !p.jaksa || !p.tanggal) {
+    alert("⚠ Semua kolom wajib diisi!");
+    return;
+  }
+
+  db.collection("perkara").doc(p.nomor).set(p).then(() => {
+    alert("Data ditambahkan!");
+    tampilkanSemua();
+    toggleForm();
+  });
+}
+
+// EDIT DATA (READ → FILL FORM)
+function editData(nomor) {
+  db.collection("perkara").doc(nomor).get().then((doc) => {
+    let p = doc.data();
+
+    formEdit.style.display = "block";
+    eNama.value = p.nama;
+    eNomor.value = p.nomor;
+    eJaksa.value = p.jaksa;
+    eTanggal.value = p.tanggal;
+    eStatus.value = p.status;
+  });
+}
+
+// SIMPAN EDIT (UPDATE)
+function simpanEdit() {
+  const nomor = eNomor.value;
+
+  const p = {
+    nama: eNama.value,
+    nomor: nomor,
+    jaksa: eJaksa.value,
+    tanggal: eTanggal.value,
+    status: eStatus.value
+  };
+
+  db.collection("perkara").doc(nomor).set(p).then(() => {
+    alert("Berhasil disimpan!");
+    formEdit.style.display = "none";
+    tampilkanSemua();
+  });
+}
+
+// HAPUS DATA (DELETE)
+function hapusData(nomor) {
+  if (!confirm("Hapus data ini?")) return;
+
+  db.collection("perkara").doc(nomor).delete().then(() => {
+    alert("Data dihapus!");
+    tampilkanSemua();
+  });
+}
+
+function toggleForm() {
+  formTambah.style.display =
+    formTambah.style.display === "none" ? "block" : "none";
+}
+
+function batalEdit() {
+  formEdit.style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
