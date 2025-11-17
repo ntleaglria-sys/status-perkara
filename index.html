@@ -13,55 +13,30 @@
       color: white;
     }
 
-    /* LOGIN */
-    #loginPage {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100vh; background: rgba(0,0,0,0.6);
-    }
-    #loginBox { background: rgba(0,0,0,0.75); padding: 30px; border-radius: 10px; text-align: center; }
-    #loginBox h2 { color: #ff4444; margin-bottom: 20px; }
+    #loginPage { display:flex; flex-direction:column; align-items:center; justify-content:center;
+      height:100vh; background:rgba(0,0,0,0.6); }
+    #loginBox { background:rgba(0,0,0,0.75); padding:30px; border-radius:10px; text-align:center; }
+    #loginBox h2 { color:#ff4444; margin-bottom:20px; }
     input, select, textarea {
-      width: 250px; padding: 10px; margin: 5px; border: none; border-radius: 5px;
-      font-family: 'Times New Roman';
+      width:250px; padding:10px; margin:5px; border:none; border-radius:5px;
+      font-family:'Times New Roman';
     }
     button {
-      padding: 10px 20px; margin: 10px; border: none; border-radius: 5px;
-      background: #007bff; color: white; cursor: pointer;
-      font-family: 'Times New Roman';
+      padding:10px 20px; margin:10px; border:none; border-radius:5px;
+      background:#007bff; color:white; cursor:pointer;
     }
 
-    /* HALAMAN UTAMA */
-    #mainPage { display: none; min-height: 100vh; background: rgba(0,0,0,0.6); }
-    header {
-      padding: 15px; border-bottom: 2px solid #ff4444; text-align: center; position: relative;
-    }
-    header h1 { color: #ff4444; margin: 0; }
-    header button { position: absolute; top: 15px; right: 15px; background: #ff4444; }
+    #mainPage { display:none; min-height:100vh; background:rgba(0,0,0,0.6); }
+    header { padding:15px; border-bottom:2px solid #ff4444; text-align:center; position:relative; }
+    header h1 { color:#ff4444; margin:0; }
+    header button { position:absolute; top:15px; right:15px; background:#ff4444; }
 
-    main { padding: 20px; max-width: 900px; margin: auto; text-align: center; }
+    main { padding:20px; max-width:900px; margin:auto; text-align:center; }
 
-    /* TABEL PUTIH */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: white;
-      margin-top: 15px;
-      font-family: 'Times New Roman';
-    }
-    th, td {
-      border: 1px solid black;
-      padding: 10px;
-      text-align: left;
-      color: black;
-    }
-    th {
-      background-color: #ffdddd;
-      color: #ff4444;
-    }
-
-    footer {
-      margin-top: 20px; background: rgba(0,0,0,0.6); padding: 10px; color: #ccc; text-align: center;
-    }
+    table { width:100%; border-collapse:collapse; background:white; margin-top:15px; }
+    th, td { border:1px solid black; padding:10px; color:black; }
+    th { background:#ffdddd; color:#ff4444; }
+    footer { margin-top:20px; background:rgba(0,0,0,0.6); padding:10px; text-align:center; color:#ccc; }
   </style>
 </head>
 <body>
@@ -73,7 +48,7 @@
     <input id="username" type="text" placeholder="Username"><br>
     <input id="password" type="password" placeholder="Password"><br>
     <button onclick="login()">Masuk</button>
-    <p id="loginError" style="color: #ff8080;"></p>
+    <p id="loginError" style="color:#ff8080;"></p>
   </div>
 </div>
 
@@ -86,15 +61,12 @@
   </header>
 
   <main>
-
-    <!-- PENCARIAN -->
     <div>
       <input id="keyword" type="text" placeholder="Cari nama jaksa / nomor berkas / status">
       <button onclick="cari()">Cari</button>
       <button id="btnTambah" style="display:none;" onclick="toggleForm()">➕ Tambah Data</button>
     </div>
 
-    <!-- HASIL -->
     <div id="hasil"></div>
 
     <!-- FORM TAMBAH -->
@@ -143,7 +115,6 @@
       <button onclick="batalEdit()">❌ Batal</button>
     </div>
 
-    <!-- TABEL ADMIN -->
     <div id="tabelContainer"></div>
 
   </main>
@@ -153,7 +124,8 @@
   </footer>
 </div>
 
-<!-- FIREBASE COMPAT (WAJIB) -->
+
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -174,6 +146,11 @@ const db = firebase.firestore();
 
 let role = null;
 
+// FIX: Fungsi untuk membuat ID dokumen aman
+function safeId(nomor) {
+  return nomor.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 // LOGIN
 function login() {
   const user = username.value.trim();
@@ -192,9 +169,7 @@ function login() {
   }
 }
 
-function logout() {
-  location.reload();
-}
+function logout() { location.reload(); }
 
 // CARI
 function cari() {
@@ -229,7 +204,7 @@ function cari() {
   });
 }
 
-// TAMPILKAN SEMUA (ADMIN)
+// TAMPILKAN SEMUA
 function tampilkanSemua() {
   db.collection("perkara").get().then((snap) => {
     const data = snap.docs.map(d => d.data());
@@ -267,7 +242,7 @@ function tampilkanSemua() {
   });
 }
 
-// TAMBAH DATA
+// TAMBAH DATA (FIX)
 function tambahData() {
   const p = {
     nama: tNama.value.trim(),
@@ -277,16 +252,20 @@ function tambahData() {
     status: tStatus.value
   };
 
-  db.collection("perkara").doc(p.nomor).set(p).then(() => {
+  const id = safeId(p.nomor); // FIX
+
+  db.collection("perkara").doc(id).set(p).then(() => {
     alert("Data ditambahkan!");
     tampilkanSemua();
     formTambah.style.display = "none";
   });
 }
 
-// EDIT DATA
+// EDIT DATA (FIX)
 function editData(nomor) {
-  db.collection("perkara").doc(nomor).get().then((doc) => {
+  const id = safeId(nomor);
+
+  db.collection("perkara").doc(id).get().then((doc) => {
     let p = doc.data();
 
     formEdit.style.display = "block";
@@ -298,9 +277,10 @@ function editData(nomor) {
   });
 }
 
-// SIMPAN EDIT
+// SIMPAN EDIT (FIX)
 function simpanEdit() {
   const nomor = eNomor.value;
+  const id = safeId(nomor);
 
   const p = {
     nama: eNama.value,
@@ -310,18 +290,20 @@ function simpanEdit() {
     status: eStatus.value
   };
 
-  db.collection("perkara").doc(nomor).set(p).then(() => {
+  db.collection("perkara").doc(id).set(p).then(() => {
     alert("Berhasil disimpan!");
     formEdit.style.display = "none";
     tampilkanSemua();
   });
 }
 
-// HAPUS DATA
+// HAPUS DATA (FIX)
 function hapusData(nomor) {
   if (!confirm("Hapus data ini?")) return;
 
-  db.collection("perkara").doc(nomor).delete().then(() => {
+  const id = safeId(nomor);
+
+  db.collection("perkara").doc(id).delete().then(() => {
     alert("Data dihapus!");
     tampilkanSemua();
   });
@@ -332,9 +314,7 @@ function toggleForm() {
     formTambah.style.display === "none" ? "block" : "none";
 }
 
-function batalEdit() {
-  formEdit.style.display = "none";
-}
+function batalEdit() { formEdit.style.display = "none"; }
 
 </script>
 
