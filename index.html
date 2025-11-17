@@ -7,11 +7,11 @@
 
   <style>
     body {
-      margin:0; padding:0;
-      font-family:'Times New Roman';
-      background:url("WhatsApp Image 2025-10-22 at 12.50.31_fc72869a.jpg") no-repeat center center fixed;
-      background-size:cover;
-      color:white;
+      margin: 0; padding: 0;
+      font-family: 'Times New Roman', serif;
+      background: url("WhatsApp Image 2025-10-22 at 12.50.31_fc72869a.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
     }
 
     #loginPage {
@@ -21,7 +21,6 @@
     #loginBox {
       background:rgba(0,0,0,0.75); padding:30px; border-radius:10px; text-align:center;
     }
-    #loginBox h2 { color:#ff4444; margin-bottom:20px; }
 
     input, select {
       width:250px; padding:10px; margin:5px; border:none; border-radius:5px;
@@ -32,18 +31,11 @@
       background:#007bff; color:white; cursor:pointer;
     }
 
-    #mainPage { display:none; min-height:100vh; background:rgba(0,0,0,0.6); }
-    header { padding:15px; border-bottom:2px solid #ff4444; text-align:center; position:relative; }
-    header h1 { color:#ff4444; margin:0; }
-    header button { position:absolute; top:15px; right:15px; background:#ff4444; }
-
-    main { padding:20px; max-width:900px; margin:auto; text-align:center; }
-
+    #mainPage { display:none; background:rgba(0,0,0,0.6); min-height:100vh; }
     table { width:100%; border-collapse:collapse; background:white; margin-top:15px; }
     th, td { border:1px solid black; padding:10px; color:black; }
     th { background:#ffdddd; color:#ff4444; }
 
-    footer { margin-top:20px; background:rgba(0,0,0,0.6); padding:10px; text-align:center; color:#ccc; }
   </style>
 </head>
 <body>
@@ -61,17 +53,16 @@
 
 <!-- MAIN PAGE -->
 <div id="mainPage">
-  <header>
-    <h1>KEJAKSAAN NEGERI KOTAMOBAGU</h1>
+  <header style="text-align:center; padding:20px;">
+    <h1 style="color:#ff4444;">KEJAKSAAN NEGERI KOTAMOBAGU</h1>
     <h3>Informasi Status Perkara</h3>
-    <button onclick="logout()">Logout</button>
+    <button onclick="logout()" style="background:#ff4444; position:absolute; right:20px; top:20px;">Logout</button>
   </header>
 
-  <main>
+  <main style="max-width:900px; margin:auto; text-align:center;">
 
-    <!-- PENCARIAN -->
     <div>
-      <input id="keyword" type="text" placeholder="Cari nama / nomor berkas / jaksa / status">
+      <input id="keyword" type="text" placeholder="Cari nama jaksa / nomor berkas / status">
       <button onclick="cari()">Cari</button>
       <button id="btnTambah" style="display:none;" onclick="toggleForm()">➕ Tambah Data</button>
     </div>
@@ -79,14 +70,11 @@
     <div id="hasil"></div>
 
     <!-- FORM TAMBAH -->
-    <div id="formTambah" style="display:none;">
-      <h3 style="color:#ff4444;">📝 Tambah Data Perkara</h3>
-
+    <div id="formTambah" style="display:none; margin-top:20px;">
+      <h3 style="color:#ff4444;">Tambah Data Perkara</h3>
       <input id="tNama" type="text" placeholder="Nama Tersangka"><br>
-      <input id="tNomor" type="text" placeholder="Nomor Berkas Perkara"><br>
+      <input id="tNomor" type="text" placeholder="Nomor Berkas (boleh pakai / . -)"><br>
       <input id="tJaksa" type="text" placeholder="Nama Jaksa"><br>
-
-      <label>Tanggal Berkas Perkara:</label><br>
       <input id="tTanggal" type="date"><br>
 
       <select id="tStatus">
@@ -104,14 +92,12 @@
     </div>
 
     <!-- FORM EDIT -->
-    <div id="formEdit" style="display:none;">
-      <h3 style="color:#ff4444;">✏ Edit Data Perkara</h3>
-
+    <div id="formEdit" style="display:none; margin-top:20px;">
+      <h3 style="color:#ff4444;">Edit Data Perkara</h3>
       <input id="eNama" type="text"><br>
       <input id="eNomor" type="text" disabled><br>
       <input id="eJaksa" type="text"><br>
       <input id="eTanggal" type="date"><br>
-
       <select id="eStatus">
         <option value="P-18">P-18</option>
         <option value="P-19">P-19</option>
@@ -123,147 +109,136 @@
         <option value="BERKAS TAHAP 1">BERKAS TAHAP 1</option>
       </select><br>
 
-      <button onclick="simpanEdit()">💾 Simpan Perubahan</button>
-      <button onclick="batalEdit()">❌ Batal</button>
+      <button onclick="simpanEdit()">Simpan</button>
+      <button onclick="batalEdit()">Batal</button>
     </div>
 
     <div id="tabelContainer"></div>
 
   </main>
 
-  <footer>
-    © 2025 Kejaksaan Negeri Kotamobagu | Informasi Publik Status Perkara
-  </footer>
 </div>
-
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// FIREBASE CONFIG
-const firebaseConfig = {
+// CONFIG
+firebase.initializeApp({
   apiKey: "AIzaSyAQ3GwaExZXpEaNNFMo5bbfiSDAG3MvH2g",
   authDomain: "status-perkara.firebaseapp.com",
-  projectId: "status-perkara",
-  storageBucket: "status-perkara.firebasestorage.app",
-  messagingSenderId: "340708770522",
-  appId: "1:340708770522:web:5a39447093fe1e525f9be3"
-};
+  projectId: "status-perkara"
+});
 
-firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-// =========================
-// FIX: SAFE ID FIRESTORE
-// =========================
-function safeId(nomor) {
-  return nomor.replace(/[^a-zA-Z0-9_-]/g, "_");
-}
 
 let role = null;
 
+// SAFE ID — nomor berkas boleh pakai simbol
+function safeId(n) {
+  return n.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 // LOGIN
 function login() {
-  const user = username.value.trim();
-  const pass = password.value.trim();
+  const u = username.value.trim();
+  const p = password.value.trim();
 
-  if (user === "ADMINPIDUM" && pass === "PIDUM123") role = "admin";
-  else if (user === "PENGUNJUNG" && pass === "TAMPIL123") role = "user";
-  else { loginError.textContent = "❌ Username atau Password salah!"; return; }
+  if (u === "ADMINPIDUM" && p === "PIDUM123") role = "admin";
+  else if (u === "PENGUNJUNG" && p === "TAMPIL123") role = "user";
+  else { loginError.textContent = "❌ Username/Password salah"; return; }
 
   loginPage.style.display = "none";
   mainPage.style.display = "block";
 
   if (role === "admin") {
     btnTambah.style.display = "inline-block";
-    tampilkanSemua();
   }
+
+  tampilkanSemua();
 }
 
 function logout() { location.reload(); }
 
-// =========================
-//     FUNGSI PENCARIAN
-// =========================
+// CARI (FULL FIX)
 function cari() {
   const key = keyword.value.trim().toUpperCase();
   hasil.innerHTML = "";
 
   db.collection("perkara").get().then(snap => {
-    const ditemukan = snap.docs
-      .map(d => d.data())
-      .filter(p =>
-        p.nama.toUpperCase().includes(key) ||
-        p.nomor.toUpperCase().includes(key) ||
-        p.jaksa.toUpperCase().includes(key) ||
-        p.status.toUpperCase().includes(key)
+    const data = snap.docs.map(d => d.data());
+
+    const ditemukan = data.filter(p => {
+      let nama   = (p.nama   || "").toUpperCase();
+      let nomor  = (p.nomor  || "").toUpperCase();
+      let jaksa  = (p.jaksa  || "").toUpperCase();
+      let status = (p.status || "").toUpperCase();
+
+      return (
+        nama.includes(key) ||
+        nomor.includes(key) ||
+        jaksa.includes(key) ||
+        status.includes(key)
       );
+    });
 
     if (ditemukan.length === 0) {
-      hasil.innerHTML = "<p style='color:#ff4444;'>⚠ Tidak ada data.</p>";
+      hasil.innerHTML = `<p style="color:#ff4444;">Tidak ada data ditemukan.</p>`;
       return;
     }
 
     hasil.innerHTML =
-      "<h3 style='color:#ff4444;'>🔍 Hasil Pencarian</h3>" +
+      "<h3 style='color:#ff4444;'>Hasil Pencarian</h3>" +
       ditemukan.map(p => `
-        <p><b>Nama Tersangka:</b> ${p.nama}</p>
+        <p><b>Nama:</b> ${p.nama}</p>
         <p><b>Nomor Berkas:</b> ${p.nomor}</p>
-        <p><b>Nama Jaksa:</b> ${p.jaksa}</p>
-        <p><b>Tanggal Berkas:</b> ${p.tanggal}</p>
+        <p><b>Jaksa:</b> ${p.jaksa}</p>
+        <p><b>Tanggal:</b> ${p.tanggal}</p>
         <p><b>Status:</b> ${p.status}</p>
         <hr>
       `).join("");
   });
 }
 
-// =========================
-//   TAMPILKAN SEMUA DATA
-// =========================
+// TAMPILKAN SEMUA
 function tampilkanSemua() {
   db.collection("perkara").get().then(snap => {
     const data = snap.docs.map(d => d.data());
 
     tabelContainer.innerHTML = `
-      <h3 style="color:#ff4444;">📋 Semua Data Perkara</h3>
+      <h3 style="color:#ff4444;">Semua Data Perkara</h3>
       <table>
-        <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Nomor Berkas</th>
+          <th>Jaksa</th>
+          <th>Tanggal</th>
+          <th>Status</th>
+          ${role === "admin" ? "<th>Aksi</th>" : ""}
+        </tr>
+
+        ${data.map(p => `
           <tr>
-            <th>Nama Tersangka</th>
-            <th>Nomor Berkas</th>
-            <th>Nama Jaksa</th>
-            <th>Tanggal</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${data.map(p => `
-            <tr>
-              <td>${p.nama}</td>
-              <td>${p.nomor}</td>
-              <td>${p.jaksa}</td>
-              <td>${p.tanggal}</td>
-              <td>${p.status}</td>
+            <td>${p.nama}</td>
+            <td>${p.nomor}</td>
+            <td>${p.jaksa}</td>
+            <td>${p.tanggal}</td>
+            <td>${p.status}</td>
+            ${role === "admin" ? `
               <td>
-                <button onclick="editData('${p.nomor}')">✏ Edit</button>
-                <button onclick="hapusData('${p.nomor}')">🗑 Hapus</button>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
+                <button onclick="editData('${p.nomor}')">Edit</button>
+                <button onclick="hapusData('${p.nomor}')">Hapus</button>
+              </td>` : ""}
+          </tr>
+        `).join("")}
       </table>
     `;
   });
 }
 
-// =========================
-//      TAMBAH DATA
-// =========================
+// TAMBAH
 function tambahData() {
-
   const p = {
     nama: tNama.value.trim(),
     nomor: tNomor.value.trim(),
@@ -271,11 +246,6 @@ function tambahData() {
     tanggal: tTanggal.value,
     status: tStatus.value
   };
-
-  if (!p.nama || !p.nomor || !p.jaksa || !p.tanggal) {
-    alert("Mohon lengkapi semua data.");
-    return;
-  }
 
   const id = safeId(p.nomor);
 
@@ -286,28 +256,23 @@ function tambahData() {
   });
 }
 
-// =========================
-//        EDIT DATA
-// =========================
+// EDIT
 function editData(nomor) {
   const id = safeId(nomor);
 
   db.collection("perkara").doc(id).get().then(doc => {
     const p = doc.data();
 
+    formEdit.style.display = "block";
     eNama.value = p.nama;
     eNomor.value = p.nomor;
     eJaksa.value = p.jaksa;
     eTanggal.value = p.tanggal;
     eStatus.value = p.status;
-
-    formEdit.style.display = "block";
   });
 }
 
-// =========================
-//     SIMPAN EDIT
-// =========================
+// SIMPAN EDIT
 function simpanEdit() {
   const nomor = eNomor.value;
   const id = safeId(nomor);
@@ -327,11 +292,9 @@ function simpanEdit() {
   });
 }
 
-// =========================
-//        HAPUS DATA
-// =========================
+// HAPUS
 function hapusData(nomor) {
-  if (!confirm("Yakin menghapus data ini?")) return;
+  if (!confirm("Hapus data ini?")) return;
 
   const id = safeId(nomor);
 
@@ -342,13 +305,13 @@ function hapusData(nomor) {
 }
 
 function toggleForm() {
-  formTambah.style.display = formTambah.style.display === "none" ? "block" : "none";
+  formTambah.style.display =
+    formTambah.style.display === "none" ? "block" : "none";
 }
 
 function batalEdit() {
   formEdit.style.display = "none";
 }
-
 </script>
 
 </body>
